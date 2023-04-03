@@ -1,7 +1,10 @@
 package com.blogapp.meet.controllers;
 
+import com.blogapp.meet.payloads.ApiResponse;
 import com.blogapp.meet.payloads.UserDto;
+import com.blogapp.meet.repositories.UserRepo;
 import com.blogapp.meet.services.UserService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -25,23 +28,36 @@ public class UserController {
     @Autowired
     private UserService userService;
 
+    @Autowired
+    private UserRepo userRepo;
     @PostMapping("/")
-    public ResponseEntity<UserDto> createUser(@RequestBody UserDto userDto){
+    public ResponseEntity<UserDto> createUser(@Valid @RequestBody UserDto userDto){
         UserDto createdUserDto = this.userService.createUser(userDto);
         return new ResponseEntity<>(createdUserDto, HttpStatus.CREATED);
     }
 
+//    @GetMapping("/")
+//    public List<UserDto> getAllUser(){
+//        List<UserDto> getAllUserDto = this.userService.getAllUsers();
+//        return getAllUserDto;
+//    }
+
     @GetMapping("/")
-    public List<UserDto> getAllUser(){
-        List<UserDto> getAllUserDto = this.userService.getAllUsers();
-        return getAllUserDto;
+    public ResponseEntity<List<UserDto>> getAllUser(){
+        return ResponseEntity.ok(this.userService.getAllUsers());
     }
 
     @GetMapping("/{userId}")
-    public ResponseEntity<UserDto> getById(@PathVariable()Integer userId){
-        UserDto getUserById = this.userService.getUserById(userId);
-        return new ResponseEntity<>(getUserById,HttpStatus.OK);
+    public ResponseEntity<UserDto> getUserById(@PathVariable Integer userId){
+        return ResponseEntity.ok(this.userService.getUserById(userId));
     }
+
+
+//    @GetMapping("/{userId}")
+//    public ResponseEntity<UserDto> getById(@PathVariable()Integer userId){
+//        UserDto getUserById = this.userService.getUserById(userId);
+//        return new ResponseEntity<>(getUserById,HttpStatus.OK);
+//    }
 
     @PutMapping("/{userId}")
     public ResponseEntity<UserDto> updateUser(@RequestBody UserDto userDto, @PathVariable Integer userId){
@@ -51,11 +67,15 @@ public class UserController {
 
     }
 
-    @DeleteMapping("{userId}")
-    public ResponseEntity<?> deleteUser(@PathVariable Integer userId){
-          this.userService.deleteUser(userId);
-          return new ResponseEntity<>(Map.of("Message","User deleted successfully"),HttpStatus.OK);
+    @DeleteMapping("/{userId}")
+    public ResponseEntity<ApiResponse> deleteUser(@PathVariable Integer userId){
+
+        this.userService.deleteUser(userId);
+        //return new ResponseEntity<>(Map.of("Message","User deleted successfully"),HttpStatus.OK);
+        return new ResponseEntity<>(new ApiResponse("User Deleted successfully",true),HttpStatus.OK);
+
     }
+
 
 
 }
